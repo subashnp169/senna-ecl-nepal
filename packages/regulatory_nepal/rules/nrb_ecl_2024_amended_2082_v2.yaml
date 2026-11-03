@@ -1,0 +1,17 @@
+version: nrb_ecl_2024_amended_2082_v2
+pd_floor: 0.025
+lgd_floor_no_history: 0.45
+collateral_haircut: 0.25
+govt_guarantee_lgd_min: 0.0
+subordinated_lgd_min: 0.75
+fx_govt_guarantee_lgd_min: 0.20
+stage1_months: 1
+stage2_min_months: 1
+stage2_max_months: 3
+stage3_months: 3
+poci_new_loan_to_prev_stage3: true
+calendar: BS
+description: >
+  NRB NFRS 9 ECL Guidelines 2024 with 2082/83 first amendment.
+  Calendar-month delinquency backstops; 2.5% PD floor; 45% LGD floor where
+  no reliable history; 25% collateral haircut.

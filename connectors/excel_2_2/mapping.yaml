@@ -1,0 +1,20 @@
+connector_id: infinity-empower-2-2-v1
+required_columns:
+  customer_code: [CUSTOMER_CODE]
+  account_no: [AC_NO]
+  branch_code: [BR_CODE]
+  product_name: [F_TYPE_OF_CREDIT]
+  principal_outstanding: [F_OUTSTANDING_PRICIPAL, F_OUTSTANDING_PRINCIPAL]
+  interest_outstanding: [F_OUTSTANDING_INTEREST]
+  overdue_principal: [F_OVERDUE_PRICIPAL, F_OVERDUE_PRINCIPAL]
+  overdue_days: [OVERDUE_DAYS]
+  classification_code: [CLASSIFICATION]
+  existing_provision: [PROVISION]
+optional_columns:
+  centre_code: [CENTER_CODE]
+  approved_limit: [F_APPROVED_LIMIT]
+  investment_date: [INVESTMENT_EDATE]
+  maturity_date: [LOAN_EXPIRY_DATE, PAYMENT_EDATE]
+  last_payment_date: [LAST_PAYMENT_EDATE]
+  interest_rate: [INT_RATE]
+  savings_balance: [Total Saving Amount]

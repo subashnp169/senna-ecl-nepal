@@ -1,0 +1,28 @@
+# Python dependencies
+# Core
+numpy>=1.26
+pandas>=2.2
+scipy>=1.12
+pydantic>=2.6
+pyyaml>=6.0
+python-dateutil>=2.9
+
+# API
+fastapi>=0.110
+uvicorn[standard]>=0.29
+sqlalchemy>=2.0
+psycopg2-binary>=2.9
+alembic>=1.13
+python-multipart>=0.0.9
+
+# Dashboard
+streamlit>=1.33
+plotly>=5.20
+openpyxl>=3.1
+
+# Excel parsing
+xlsxwriter>=3.2
+
+# Testing
+pytest>=8.0
+pytest-cov>=5.0
