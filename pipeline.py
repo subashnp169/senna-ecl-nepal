@@ -13,6 +13,7 @@ from connectors.excel_2_2.ingestion import ingest_excel, IngestionResult
 from packages.ecl_core import Loan, Stage, classify_stage, lifetime_ecl, marginal_pd_from_cumulative
 from packages.regulatory_nepal import calendar_month_stage, apply_lgd_floor, provision_comparison
 from reporting.generator import TenantConfig, generate_excel_report, generate_csv_report, generate_json_report
+from reporting.html_report import generate_html_report
 from db import create_run, finish_run, add_artifact
 from validation import run_standard_checks
 
@@ -166,10 +167,12 @@ def run_pipeline(
         xp = generate_excel_report(result.rows, result.totals, tenant, str(run_dir / "ecl_report.xlsx"))
         cp = generate_csv_report(result.rows, str(run_dir / "ecl_report.csv"))
         jp = generate_json_report(result.rows, result.totals, str(run_dir / "ecl_report.json"))
-        result.report_paths = {"excel": xp, "csv": cp, "json": jp}
+        hp = generate_html_report(result.rows, result.totals, tenant_name, str(run_dir / "ecl_report.html"))
+        result.report_paths = {"excel": xp, "csv": cp, "json": jp, "html": hp}
         add_artifact(run_id, "excel", xp)
         add_artifact(run_id, "csv", cp)
         add_artifact(run_id, "json", jp)
+        add_artifact(run_id, "html", hp)
         step.status = "ok"
         step.detail = f"3 reports in {run_dir}"
         logger.info("reports generated: %s", run_dir)

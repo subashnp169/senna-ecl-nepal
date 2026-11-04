@@ -26,3 +26,35 @@
 2026-11-04 15:42:59,353 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\eaeaa69ec324e582
 2026-11-04 15:42:59,367 | INFO | senna_ecl | pipeline completed run_id=eaeaa69ec324e582
 2026-11-04 15:53:20,076 | INFO | senna_ecl | pipeline start run_id=3bf2794f43af08fe source=D:\data\NRB_2_2_REPORT_REVAMPED_000080__20261008_095117.xlsx
+2026-11-04 15:54:42,335 | INFO | senna_ecl | ingested 33136 loans
+2026-11-04 15:54:43,540 | INFO | senna_ecl | ECL done: 33136 loans; ECL=56,532,169; coverage=0.94%
+2026-11-04 15:54:57,854 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\3bf2794f43af08fe
+2026-11-04 15:54:57,868 | INFO | senna_ecl | pipeline completed run_id=3bf2794f43af08fe
+2026-11-04 16:05:32,013 | INFO | senna_ecl | pipeline start run_id=67e0f2d3254ed7d9 source=D:\data\NRB_2_2_REPORT_REVAMPED_000080__20261008_095117.xlsx
+2026-11-04 16:06:59,725 | INFO | senna_ecl | ingested 33136 loans
+2026-11-04 16:07:01,170 | INFO | senna_ecl | ECL done: 33136 loans; ECL=56,532,169; coverage=0.94%
+2026-11-04 16:07:17,059 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\67e0f2d3254ed7d9
+2026-11-04 16:07:17,075 | INFO | senna_ecl | pipeline completed run_id=67e0f2d3254ed7d9
+2026-11-04 16:29:29,380 | INFO | senna_ecl | pipeline start run_id=00c51b6fe64ec0da source=D:\data\NRB_2_2_REPORT_REVAMPED_000080__20261008_095117.xlsx
+2026-11-04 16:30:50,392 | INFO | senna_ecl | ingested 33136 loans
+2026-11-04 16:30:51,577 | INFO | senna_ecl | ECL done: 33136 loans; ECL=56,532,169; coverage=0.94%
+2026-11-04 16:31:06,348 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\00c51b6fe64ec0da
+2026-11-04 16:31:06,361 | INFO | senna_ecl | pipeline completed run_id=00c51b6fe64ec0da
+2026-11-04 18:50:38,141 | INFO | senna_ecl | pipeline start run_id=c64ba6ab237de3d4 source=sample_data/infinity_sample.xlsx
+2026-11-04 18:50:38,699 | INFO | senna_ecl | ingested 120 loans
+2026-11-04 18:50:38,705 | INFO | senna_ecl | ECL done: 120 loans; ECL=197,300; coverage=0.97%
+2026-11-04 18:50:38,846 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\c64ba6ab237de3d4
+2026-11-04 18:50:38,857 | INFO | senna_ecl | pipeline completed run_id=c64ba6ab237de3d4
+2026-11-04 18:50:38,876 | INFO | senna_ecl | pipeline start run_id=1221c977772bf921 source=D:\data\NRB_2_2_REPORT_REVAMPED_000080__20261008_095117.xlsx
+2026-11-04 18:52:20,199 | INFO | senna_ecl | ingested 33136 loans
+2026-11-04 18:52:21,649 | INFO | senna_ecl | ECL done: 33136 loans; ECL=56,532,169; coverage=0.94%
+2026-11-04 18:52:41,868 | INFO | senna_ecl | pipeline start run_id=88235eacd8fd5689 source=sample_data/infinity_sample.xlsx
+2026-11-04 18:52:42,561 | INFO | senna_ecl | ingested 120 loans
+2026-11-04 18:52:42,566 | INFO | senna_ecl | ECL done: 120 loans; ECL=197,300; coverage=0.97%
+2026-11-04 18:52:42,709 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\88235eacd8fd5689
+2026-11-04 18:52:42,722 | INFO | senna_ecl | pipeline completed run_id=88235eacd8fd5689
+2026-11-04 19:04:29,191 | INFO | senna_ecl | pipeline start run_id=8c259e0840b95763 source=sample_data/infinity_sample.xlsx
+2026-11-04 19:04:29,848 | INFO | senna_ecl | ingested 120 loans
+2026-11-04 19:04:29,854 | INFO | senna_ecl | ECL done: 120 loans; ECL=197,300; coverage=0.97%
+2026-11-04 19:04:30,054 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\8c259e0840b95763
+2026-11-04 19:04:30,070 | INFO | senna_ecl | pipeline completed run_id=8c259e0840b95763

@@ -122,12 +122,21 @@ if run_clicked:
 
     # Downloads
     st.subheader("Download reports")
-    col1, col2, col3 = st.columns(3)
-    for col, kind, label in ((col1, "excel", "Excel (.xlsx)"), (col2, "csv", "CSV (.csv)"), (col3, "json", "JSON (.json)")):
+    col1, col2, col3, col4 = st.columns(4)
+    for col, kind, label, mime in ((col1, "excel", "Excel (.xlsx)", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                                   (col2, "csv", "CSV (.csv)", "text/csv"),
+                                   (col3, "json", "JSON (.json)", "application/json"),
+                                   (col4, "html", "HTML (.html)", "text/html")):
         pth = result.report_paths.get(kind)
         if pth and os.path.exists(pth):
             with open(pth, "rb") as f:
-                col.download_button(label, f, os.path.basename(pth))
+                col.download_button(label, f, os.path.basename(pth), mime=mime)
+    # Preview HTML inline
+    hp = result.report_paths.get("html")
+    if hp and os.path.exists(hp):
+        st.subheader("HTML report preview")
+        with open(hp, encoding="utf-8") as f:
+            st.components.v1.html(f.read(), height=600, scrolling=True)
 
     st.info("All outputs are PRELIMINARY/RESEARCH. Not approved for statutory booking.")
     st.session_state["last_result"] = result.run_id
