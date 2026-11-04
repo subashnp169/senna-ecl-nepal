@@ -11,6 +11,19 @@ from pipeline import run_pipeline
 from db import list_runs
 
 st.set_page_config(page_title="SENNA ECL — System", layout="wide")
+
+page = st.sidebar.radio("Navigate", ["Run ECL", "User Guide"], index=0)
+
+if page == "User Guide":
+    st.title("SENNA ECL — User Guide")
+    guide_path = os.path.join(os.path.dirname(__file__), "..", "..", "docs", "user-guide", "ecl-guide.md")
+    if os.path.exists(guide_path):
+        with open(guide_path, encoding="utf-8") as f:
+            st.markdown(f.read())
+    else:
+        st.warning("Guide not found.")
+    st.stop()
+
 st.title("SENNA ECL — System")
 st.caption("Well-organized, transparent, user-friendly ECL system. Preliminary/Research outputs only.")
 
