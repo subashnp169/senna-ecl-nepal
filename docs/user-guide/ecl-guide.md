@@ -68,9 +68,29 @@ Every loan is placed in one of three stages based on credit risk:
 > forbearance, covenant breach, bankruptcy, etc.) can also move a loan to Stage 2/3.
 
 ### Step 3 — Calculate PD (Probability of Default)
+Infinity's PD model (per SAR Advisors methodology) works in 6 steps:
+
+1. **Define default** and build the default history (observed default rates by segment and year).
+2. **Estimate TTC PD** (through-the-cycle, long-run default rate) = average of annual default rates over 5+ years.
+3. **Calibrate Vasicek**: asset correlation (ρ) and credit cycle index (Z).
+4. **Link Z to macroeconomic variables** (GDP, inflation, credit growth, sector indicators) via regression.
+5. **Project scenarios** (base/best/worst) and convert TTC→PIT PD for each year.
+6. **Build term structure** (12-month and lifetime) and apply the 2.5% NRB floor.
+
+**Vasicek formula (standard form):**
+```
+PIT_PD = Φ( (Φ⁻¹(TTC_PD) + √ρ · Z) / √(1 − ρ) )
+```
+- Φ = standard normal CDF
+- TTC_PD = through-the-cycle default rate
+- ρ = asset correlation
+- Z = credit cycle index (positive = downturn/adverse conditions → higher PIT PD)
+
+> Note: at Z=0 the PIT PD is NOT equal to TTC PD. TTC PD is the expectation over Z~N(0,1).
+
 - **12-month PD**: likelihood of default within 12 months.
 - **Lifetime PD**: likelihood of default over the remaining life of the loan.
-- PD must use historical data + forward-looking macro information.
+- PD must use historical data + forward-looking macro information (no proxies).
 - **NRB floor**: minimum 2.5% PD for all exposures.
 
 ### Step 4 — Calculate LGD (Loss Given Default)
@@ -134,21 +154,31 @@ The "higher-of" rule ensures ECL never falls below the prudential floor.
 | dpd | CBS | Days past due |
 | classification | CBS | NRB classification (Pass/Substandard/Doubtful/Loss) |
 
-### 4.2 Recommended (V0.2+)
+### 4.2 Recommended (V0.2+) — per SAR Advisors data request
 | Field | Source | Why needed |
 |---|---|---|
 | undrawn_limit | CBS | For EAD calculation |
 | interest_rate / EIR | CBS | Discounting |
-| collateral_value | CBS/Valuation | LGD calculation |
-| collateral_type | CBS | Haircut selection |
+| collateral_value + type + valuation date | CBS/Valuation | LGD calculation |
+| cash collateral, guarantees | CBS | Recovery sources |
 | sector | CBS | Segmentation |
-| branch | CBS | Branch-level reporting |
+| branch / geographical location | CBS | Branch-level reporting |
 | watchlist flag | Risk system | SICR trigger |
 | forbearance flag | Risk system | SICR trigger |
 | repayment schedule | CBS | EAD term structure |
 | transactions (with reversals) | CBS | Cash flow validation |
-| macro indicators | NRB/IMF/ADB | Forward-looking scenarios |
+| macro indicators (GDP, inflation, credit growth, sector) | NRB/IMF/ADB | Forward-looking scenarios |
 | historical stage/default/recovery | CBS | PD/LGD calibration |
+| defaulted/closed accounts (date of first default, balance at default, recoveries with dates/sources, costs, write-offs) | CBS | LGD workout |
+| off-balance sheet (undrawn limits, commitments, guarantees, utilization) | CBS | EAD/CCF |
+| credit risk ratings (origination + current) | Risk system | SICR / segmentation |
+| NRB provisioning by category, regulatory reserve, previous ECL workings | Finance | Reconciliation |
+| investment/placement details | Treasury | Other exposures |
+
+### 4.3 Period covered
+- At least **5 years** of loan-level history (NRB requirement for PD).
+- **7 years** recommended where the system holds it (more Vasicek observations).
+- For LGD: all defaulted accounts closed or recovered.
 
 ### 4.3 NRB 2.2 report fields (Infinity's format)
 The system reads Infinity's NRB 2.2 report directly:
@@ -210,6 +240,62 @@ is treated as POCI. This requires:
 | 13 | Movement Analysis (ECL Bridge) | Excel/CSV/JSON |
 
 ---
+
+## 7b. SICR indicators (per NRB 2024 / SAR Advisors)
+
+Quantitative (test each against institution data):
+- More than 30 days past due
+- Absolute lifetime PD of 5% or more
+- Relative lifetime PD increase of 100% or more since origination
+- Risk rating downgraded by 2 notches, or to non-investment grade
+
+Qualitative:
+- Deterioration in borrower's cash flows or financial position
+- Expectation of forbearance/restructuring due to financial difficulty
+- Modification of terms resulting in restructuring/rescheduling
+- Deterioration of prospects for the borrower's sector
+- Borrowers affected by adverse macroeconomic conditions (supportable forecasts)
+- Weaker credit quality indicators in individual monitoring
+- Management decision to strengthen collateral/covenants due to rising risk
+
+> The 30 days past due indicator is a **backstop that cannot be overridden** by a
+> favorable model result.
+
+## 7c. Segmentation (collective vs individual)
+
+- **Collective**: retail and small-ticket loans, business loans below the large-exposure threshold — grouped by shared risk characteristics.
+- **Individual**: large exposures, Stage 3 exposures, exposures with borrower-specific information.
+- Segment tests: homogeneity (default rates alike), data sufficiency (enough defaults), stability (consistent across years).
+- Restructured/rescheduled loans tracked as a separate flag.
+- Segmentation reviewed at least annually and on new products / material portfolio shifts.
+
+## 7d. Probation and stage transfers
+
+- Stage 2 → Stage 1: only with evidence of significant reduction in credit risk (Board-approved criteria).
+- Stage 3 exit: minimum 180 days probation.
+- Restructured Stage 3 exit: minimum 24 months probation.
+- Restructured exposures: no move back to 12-month ECL without sufficient evidence of improved credit risk.
+
+## 7e. Back-testing and model monitoring
+
+- Compare predicted defaults, recoveries, and losses with actual outcomes at least annually.
+- Recommend model adjustments where differences are material.
+- Independent validation by a reviewer independent of the model-building team.
+- Internal Audit independently reviews data integrity, policy compliance, and follow-up of findings.
+
+## 7f. NRB quarterly reporting and transition
+
+- **NRB Annexes 1–4**: submitted within 15 days of quarter end.
+- **Day 1 impact & CET1 transition**: add-back over 5 years (85% / 65% / 50% / 30% / 15%).
+- **NFRS 7 disclosures**: stage-wise carrying amounts, loss allowance reconciliation, stage migration, write-offs and recoveries.
+- **Regulatory reserve**: institution recognizes the higher of ECL and NRB Unified Directives provisions; reconciled quarterly.
+
+## 7g. Board-approved ECL policy (minimum contents)
+
+Roles and responsibilities; control procedures for model development/validation;
+criteria for individual and collective assessment (including large exposure definition);
+SICR indicators; staging criteria (qualitative + quantitative); criteria for moving to a lower stage;
+sources of forward-looking information (macro factors).
 
 ## 8. How to use the system (step by step)
 

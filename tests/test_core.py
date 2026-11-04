@@ -45,7 +45,12 @@ def test_classify_stage2_watchlist():
 
 
 def test_vasicek_zero():
-    assert vasicek_pit_pd(0.02, 0.12, 0.0) == pytest.approx(0.02, rel=1e-6)
+    # Standard Vasicek: at z=0, PIT = Phi(Phi^-1(TTC)/sqrt(1-rho)) != TTC
+    val = vasicek_pit_pd(0.02, 0.12, 0.0)
+    assert 0.0 < val < 1.0
+    # monotonicity: higher z (downturn) -> higher PIT
+    assert vasicek_pit_pd(0.02, 0.12, 1.0) > val
+    assert vasicek_pit_pd(0.02, 0.12, -1.0) < val
 
 
 def test_vasicek_bounds():

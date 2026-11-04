@@ -73,8 +73,16 @@ def lifetime_pd_term_structure(cumulative_pd: List[float]) -> Tuple[List[float],
 def vasicek_pit_pd(ttc_pd: float, rho: float, z: float) -> float:
     """One-factor Vasicek conditional (point-in-time) PD.
 
-    PIT_PD = Phi( (Phi^{-1}(TTC_PD) + sqrt(rho)*z) / sqrt(1-rho) )
-    where z is the systematic factor (standard normal). z=0 returns TTC_PD.
+    Standard form (SAR Advisors / Infinity PD model design):
+
+        PIT_PD = Phi( (Phi^{-1}(TTC_PD) + sqrt(rho) * z) / sqrt(1 - rho) )
+
+    z is the credit-cycle index. Convention: z positive = downturn (adverse)
+    conditions -> higher PIT PD. (Infinity's workbook uses Z_Retail positive
+    when observed defaults exceed TTC.)
+
+    Note: at z=0 the PIT PD is NOT equal to TTC PD. TTC PD is the expectation
+    over z ~ N(0,1). This is the academically correct Vasicek form.
     """
     if ttc_pd <= 0:
         return 0.0
@@ -82,12 +90,11 @@ def vasicek_pit_pd(ttc_pd: float, rho: float, z: float) -> float:
         return 1.0
     if rho <= 0 or rho >= 1:
         raise ValueError("rho must be in (0,1)")
-    # First-order (additive in z-score) form: z=0 returns the TTC PD exactly,
-    # so the baseline (neutral macro) leaves PD unchanged. This matches the
-    # practitioner convention documented in ShrishDhuria/IFRS9_ECL. The full
-    # conditional Vasicek form is Phi((Phi^-1(p)+sqrt(rho)*z)/sqrt(1-rho)).
+    # Standard Vasicek conditional form (SAR Advisors / Infinity PD model):
+    #   PIT_PD = Phi( (Phi^-1(TTC_PD) + sqrt(rho)*z) / sqrt(1 - rho) )
+    # z positive = downturn (adverse) conditions -> higher PIT PD.
     x = norm.ppf(ttc_pd)
-    cond = x + math.sqrt(rho) * z
+    cond = (x + math.sqrt(rho) * z) / math.sqrt(1.0 - rho)
     return float(norm.cdf(cond))
 
 

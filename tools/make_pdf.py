@@ -89,7 +89,8 @@ class GuidePDF(FPDF):
         self.ln(2)
 
     def code(self, text):
-        self.set_font("Courier", size=9)
+        self.add_font("Consolas", "", "C:/Windows/Fonts/consola.ttf", uni=True)
+        self.set_font("Consolas", size=9)
         self.set_fill_color(240, 240, 240)
         for line in text.split("\n"):
             self.cell(0, 5, line, fill=True)
