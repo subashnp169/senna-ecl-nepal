@@ -58,3 +58,8 @@
 2026-11-04 19:04:29,854 | INFO | senna_ecl | ECL done: 120 loans; ECL=197,300; coverage=0.97%
 2026-11-04 19:04:30,054 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\8c259e0840b95763
 2026-11-04 19:04:30,070 | INFO | senna_ecl | pipeline completed run_id=8c259e0840b95763
+2026-11-04 19:05:51,638 | INFO | senna_ecl | pipeline start run_id=f5aaffc8dd53e867 source=sample_data/infinity_sample.xlsx
+2026-11-04 19:05:52,153 | INFO | senna_ecl | ingested 120 loans
+2026-11-04 19:05:52,156 | INFO | senna_ecl | ECL done: 120 loans; ECL=197,300; coverage=0.97%
+2026-11-04 19:05:53,224 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\f5aaffc8dd53e867
+2026-11-04 19:05:53,254 | INFO | senna_ecl | pipeline completed run_id=f5aaffc8dd53e867
