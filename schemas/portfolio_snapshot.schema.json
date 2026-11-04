@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SENNA ECL Portfolio Snapshot",
+  "description": "Canonical ECL data contract for vendor/tenant uploads.",
+  "type": "object",
+  "required": ["as_of_date", "institution_id", "loans"],
+  "properties": {
+    "as_of_date": { "type": "string", "format": "date" },
+    "institution_id": { "type": "string" },
+    "currency": { "type": "string", "default": "NPR" },
+    "loans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["account_id", "customer_id", "outstanding", "origination_date", "maturity_date"],
+        "properties": {
+          "account_id": { "type": "string" },
+          "customer_id": { "type": "string" },
+          "product": { "type": "string" },
+          "sector": { "type": "string" },
+          "branch": { "type": "string" },
+          "currency": { "type": "string" },
+          "origination_date": { "type": "string", "format": "date" },
+          "maturity_date": { "type": "string", "format": "date" },
+          "outstanding": { "type": "number", "minimum": 0 },
+          "undrawn_limit": { "type": "number", "minimum": 0 },
+          "interest_rate": { "type": "number" },
+          "eir": { "type": "number" },
+          "dpd": { "type": "integer", "minimum": 0 },
+          "classification": { "type": "string" },
+          "nrb_classification": { "type": "string" },
+          "status": { "type": "string" },
+          "origination_rating": { "type": "string" },
+          "current_rating": { "type": "string" },
+          "watchlist": { "type": "boolean" },
+          "forbearance": { "type": "boolean" },
+          "collateral_value": { "type": "number", "minimum": 0 },
+          "collateral_type": { "type": "string" },
+          "collateral_valuation_date": { "type": "string", "format": "date" }
+        }
+      }
+    },
+    "collateral": { "type": "array" },
+    "customers": { "type": "array" },
+    "macro": { "type": "object" },
+    "control_totals": { "type": "object" }
+  }
+}
