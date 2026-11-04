@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: SENNA ECL Vendor Data API
+  version: 1.0.0-draft
+  description: Versioned institution-to-SENNA ingestion contract.
+servers:
+  - url: https://api.example.com/vendor/v1
+security:
+  - oauth2ClientCredentials: [ecl.data.write]
+paths:
+  /batches:
+    post:
+      summary: Register a data batch
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: {type: string, minLength: 16, maxLength: 128}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/BatchRequest'}
+      responses:
+        '202':
+          description: Batch accepted for validation
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BatchResponse'}
+        '409': {description: Duplicate or conflicting batch}
+        '422': {description: Schema or control-total validation failed}
+  /batches/{batch_id}:
+    get:
+      summary: Get batch processing status
+      parameters:
+        - in: path
+          name: batch_id
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Batch status
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/BatchResponse'}
+components:
+  securitySchemes:
+    oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://identity.example.com/oauth2/token
+          scopes:
+            ecl.data.write: Submit institution data
+  schemas:
+    BatchRequest:
+      type: object
+      additionalProperties: false
+      required: [tenant_id, source_system, schema_version, dataset, reporting_date, extracted_at, records, controls]
+      properties:
+        tenant_id: {type: string, example: tenant_infinity}
+        source_system: {type: string, example: EMPOWER_CBS}
+        schema_version: {type: string, example: '1.0'}
+        dataset:
+          type: string
+          enum: [customer_master, loan_master, portfolio_snapshot, repayment_schedule, loan_transaction, classification_history, loan_event_history, writeoff_recovery]
+        reporting_date: {type: string, format: date}
+        extracted_at: {type: string, format: date-time}
+        records:
+          type: array
+          minItems: 1
+          items: {type: object}
+        controls:
+          $ref: '#/components/schemas/ControlTotals'
+    ControlTotals:
+      type: object
+      required: [record_count]
+      properties:
+        record_count: {type: integer, minimum: 0}
+        principal_outstanding: {type: number}
+        interest_outstanding: {type: number}
+        overdue_principal: {type: number}
+        provision: {type: number}
+        checksum_sha256: {type: string, pattern: '^[A-Fa-f0-9]{64}$'}
+    BatchResponse:
+      type: object
+      required: [batch_id, status]
+      properties:
+        batch_id: {type: string}
+        status:
+          type: string
+          enum: [RECEIVED, QUARANTINED, SCHEMA_VALIDATED, RECONCILED, ACCEPTED, REJECTED]
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code: {type: string}
+              field: {type: string}
+              message: {type: string}
