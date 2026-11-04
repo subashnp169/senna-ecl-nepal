@@ -17,6 +17,10 @@ page = st.sidebar.radio("Navigate", ["Run ECL", "User Guide"], index=0)
 if page == "User Guide":
     st.title("SENNA ECL — User Guide")
     guide_path = os.path.join(os.path.dirname(__file__), "..", "..", "docs", "user-guide", "ecl-guide.md")
+    pdf_path = os.path.join(os.path.dirname(__file__), "..", "..", "docs", "user-guide", "ecl-guide.pdf")
+    if os.path.exists(pdf_path):
+        with open(pdf_path, "rb") as f:
+            st.download_button("Download User Guide (PDF)", f, "ecl-guide.pdf", mime="application/pdf")
     if os.path.exists(guide_path):
         with open(guide_path, encoding="utf-8") as f:
             st.markdown(f.read())
