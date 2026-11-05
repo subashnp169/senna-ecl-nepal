@@ -63,3 +63,23 @@
 2026-11-04 19:05:52,156 | INFO | senna_ecl | ECL done: 120 loans; ECL=197,300; coverage=0.97%
 2026-11-04 19:05:53,224 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\f5aaffc8dd53e867
 2026-11-04 19:05:53,254 | INFO | senna_ecl | pipeline completed run_id=f5aaffc8dd53e867
+2026-11-05 09:05:03,776 | INFO | senna_ecl | pipeline start run_id=8a53e5e21e5a8a53 source=sample_data/infinity_sample.xlsx
+2026-11-05 09:05:04,754 | INFO | senna_ecl | ingested 120 loans
+2026-11-05 09:05:04,771 | INFO | senna_ecl | ECL done: 120 loans; ECL=1,029,800; coverage=5.05%
+2026-11-05 09:05:05,040 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\8a53e5e21e5a8a53
+2026-11-05 09:05:05,062 | INFO | senna_ecl | pipeline completed run_id=8a53e5e21e5a8a53
+2026-11-05 09:05:18,553 | INFO | senna_ecl | pipeline start run_id=c8cdd0deba624c25 source=sample_data/infinity_sample.xlsx
+2026-11-05 09:05:19,467 | INFO | senna_ecl | ingested 120 loans
+2026-11-05 09:05:19,486 | INFO | senna_ecl | ECL done: 120 loans; ECL=1,029,800; coverage=5.05%
+2026-11-05 09:05:19,690 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\c8cdd0deba624c25
+2026-11-05 09:05:19,699 | INFO | senna_ecl | pipeline completed run_id=c8cdd0deba624c25
+2026-11-05 09:06:03,809 | INFO | senna_ecl | pipeline start run_id=f3ac9596beb5cafa source=sample_data/infinity_sample.xlsx
+2026-11-05 09:06:04,490 | INFO | senna_ecl | ingested 120 loans
+2026-11-05 09:06:04,503 | INFO | senna_ecl | ECL done: 120 loans; ECL=1,029,800; coverage=5.05%
+2026-11-05 09:06:04,767 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\f3ac9596beb5cafa
+2026-11-05 09:06:04,783 | INFO | senna_ecl | pipeline completed run_id=f3ac9596beb5cafa
+2026-11-05 09:06:19,859 | INFO | senna_ecl | pipeline start run_id=b389e3a0ecb44b6a source=sample_data/infinity_sample.xlsx
+2026-11-05 09:06:20,397 | INFO | senna_ecl | ingested 120 loans
+2026-11-05 09:06:20,408 | INFO | senna_ecl | ECL done: 120 loans; ECL=1,029,800; coverage=5.05%
+2026-11-05 09:06:20,776 | INFO | senna_ecl | reports generated: D:\senna-ecl-nepal\output\reports\b389e3a0ecb44b6a
+2026-11-05 09:06:20,805 | INFO | senna_ecl | pipeline completed run_id=b389e3a0ecb44b6a

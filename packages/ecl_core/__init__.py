@@ -14,5 +14,6 @@ from .lgd import lgd_from_collateral, lgd_floor_applied, downturn_lgd  # noqa: F
 from .ead import ead_total, ead_with_accrued_interest  # noqa: F401
 from .ttc_pd import ttc_pd_from_default_rates, ttc_pd_by_segment, default_rate  # noqa: F401
 from .mev import credit_cycle_index_z, mev_regression_z  # noqa: F401
+from .pd_model import PDModel  # noqa: F401
 from .sicr_indicators import sicr_quantitative_triggers, probation_period_exit_stage3, stage_transfer_rules  # noqa: F401
 from .governance import Overlay, AuditEntry, apply_overlays  # noqa: F401

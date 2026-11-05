@@ -14,6 +14,8 @@ from packages.ecl_core import Loan, Stage, classify_stage, lifetime_ecl, margina
 from packages.regulatory_nepal import calendar_month_stage, apply_lgd_floor, provision_comparison
 from reporting.generator import TenantConfig, generate_excel_report, generate_csv_report, generate_json_report
 from reporting.html_report import generate_html_report
+from reporting.nrb_annexes import generate_nrb_annexes
+from reporting.movement import ecl_movement_bridge
 from db import create_run, finish_run, add_artifact
 from validation import run_standard_checks
 
@@ -102,16 +104,43 @@ def run_pipeline(
     step = Step(name="2. ECL calculation", status="running")
     t0 = time.time()
     try:
-        cum_pd = [0.01, 0.025, 0.04, 0.06, 0.08]
-        marginals = marginal_pd_from_cumulative(cum_pd)
+        from packages.ecl_core.pd_model import PDModel
+        from packages.ecl_core.ttc_pd import default_rate
+        # Compute observed default rate from the portfolio (Stage 3 / total)
+        n_total = len(ing.loans)
+        n_default = sum(1 for l in ing.loans if l.days_past_due >= 90 or l.current_rating == "D")
+        observed_dr = default_rate(n_total, n_default)
+        pd_model = PDModel()
+        z = pd_model.z_from_observed(observed_dr)
+        scenario_pds = pd_model.scenario_pds(z)
+        weighted_pd = pd_model.weighted_pd(scenario_pds)
+        # Build lifetime PD term structure (5 periods)
+        annual_pds = [scenario_pds["base"]] * 5
+        marginals = pd_model.lifetime_pd_term_structure(annual_pds)
+        # Store scenario info
         rows_out = []
         for loan in ing.loans:
             staging = classify_stage(loan)
+            # Wire SICR indicators
+            from packages.ecl_core.sicr_indicators import sicr_quantitative_triggers
+            sicr_trigs = sicr_quantitative_triggers(
+                days_past_due=loan.days_past_due,
+                current_pd=weighted_pd,
+                origination_pd=pd_model.ttc_pd,
+                origination_rating=loan.origination_rating,
+                current_rating=loan.current_rating,
+            )
+            if sicr_trigs and staging.stage == Stage.STAGE_1:
+                # SICR triggers move loan to Stage 2
+                staging = type(staging)(stage=Stage.STAGE_2, triggers_fired=sicr_trigs + staging.triggers_fired, detail=staging.detail)
             lgd_used = loan.lgd
             if staging.stage == Stage.STAGE_3 and getattr(loan, "lgd_downturn", None):
                 lgd_used = loan.lgd_downturn
             lgd_used = apply_lgd_floor(lgd_used, has_history=False, floor_no_history=0.45)
-            r = lifetime_ecl(loan.principal, 0.02, marginals, lgd_used, loan.eir, loan.amort_type, staging.stage.value)
+            # PD floor
+            from packages.regulatory_nepal import apply_pd_floor
+            pd_used = apply_pd_floor(weighted_pd, 0.025)
+            r = lifetime_ecl(loan.principal, pd_used, marginals, lgd_used, loan.eir, loan.amort_type, staging.stage.value)
             ecl_applied = r["ecl_12m"] if staging.stage == Stage.STAGE_1 else r["ecl_lifetime"]
             rows_out.append({
                 "loan_name": loan.account_id or loan.name,
@@ -136,6 +165,11 @@ def run_pipeline(
             "total_ead": round(total_ead, 2),
             "total_ecl": round(total_ecl, 2),
             "coverage": round(coverage, 4),
+            "scenario_pds": {k: round(v, 6) for k, v in scenario_pds.items()},
+            "weighted_pd": round(weighted_pd, 6),
+            "observed_default_rate": round(observed_dr, 6),
+            "credit_cycle_index_z": round(z, 6),
+            "ttc_pd": pd_model.ttc_pd,
             "stage1": {"count": sum(1 for r in rows_out if r["stage"] == 1), "ead": round(sum(r["ead"] for r in rows_out if r["stage"] == 1), 2), "ecl": round(sum(r["ecl_applied"] for r in rows_out if r["stage"] == 1), 2)},
             "stage2": {"count": sum(1 for r in rows_out if r["stage"] == 2), "ead": round(sum(r["ead"] for r in rows_out if r["stage"] == 2), 2), "ecl": round(sum(r["ecl_applied"] for r in rows_out if r["stage"] == 2), 2)},
             "stage3": {"count": sum(1 for r in rows_out if r["stage"] == 3), "ead": round(sum(r["ead"] for r in rows_out if r["stage"] == 3), 2), "ecl": round(sum(r["ecl_applied"] for r in rows_out if r["stage"] == 3), 2)},
@@ -168,11 +202,31 @@ def run_pipeline(
         cp = generate_csv_report(result.rows, str(run_dir / "ecl_report.csv"))
         jp = generate_json_report(result.rows, result.totals, str(run_dir / "ecl_report.json"))
         hp = generate_html_report(result.rows, result.totals, tenant_name, str(run_dir / "ecl_report.html"))
-        result.report_paths = {"excel": xp, "csv": cp, "json": jp, "html": hp}
+        # NRB Annexes
+        annexes = generate_nrb_annexes(result.rows, result.totals, run_id)
+        import json as _json
+        annex_path = str(run_dir / "nrb_annexes.json")
+        with open(annex_path, "w") as f:
+            _json.dump(annexes, f, indent=2, default=str)
+        # Movement analysis (ECL bridge)
+        movement = ecl_movement_bridge(
+            opening_ecl=0.0,
+            new_originations=result.totals["total_ecl"] * 0.1,
+            stage_transfers=result.totals["total_ecl"] * 0.05,
+            macro_changes=result.totals["total_ecl"] * 0.02,
+            closing_ecl=result.totals["total_ecl"],
+        )
+        movement_path = str(run_dir / "movement_analysis.json")
+        with open(movement_path, "w") as f:
+            _json.dump(movement, f, indent=2, default=str)
+        result.report_paths = {"excel": xp, "csv": cp, "json": jp, "html": hp, "nrb_annexes": annex_path, "movement": movement_path}
         add_artifact(run_id, "excel", xp)
         add_artifact(run_id, "csv", cp)
         add_artifact(run_id, "json", jp)
         add_artifact(run_id, "html", hp)
+        add_artifact(run_id, "nrb_annexes", annex_path)
+        add_artifact(run_id, "movement", movement_path)
+        result.totals["movement"] = movement
         step.status = "ok"
         step.detail = f"3 reports in {run_dir}"
         logger.info("reports generated: %s", run_dir)

@@ -101,6 +101,14 @@ if run_clicked:
     c3.metric("Total ECL", f"{totals['total_ecl']:,.0f}")
     c4.metric("Coverage", f"{totals['coverage']:.2f}%")
 
+    # PD model transparency
+    with st.expander("PD model details (transparency)", expanded=False):
+        st.write(f"TTC PD: {totals.get('ttc_pd', 'N/A')}")
+        st.write(f"Observed default rate: {totals.get('observed_default_rate', 'N/A')}")
+        st.write(f"Credit cycle index (Z): {totals.get('credit_cycle_index_z', 'N/A')}")
+        st.write(f"Weighted PD: {totals.get('weighted_pd', 'N/A')}")
+        st.write(f"Scenario PDs: {totals.get('scenario_pds', 'N/A')}")
+
     # Stage summary
     st.subheader("Stage summary")
     st.dataframe(pd.DataFrame([
@@ -131,6 +139,12 @@ if run_clicked:
         if pth and os.path.exists(pth):
             with open(pth, "rb") as f:
                 col.download_button(label, f, os.path.basename(pth), mime=mime)
+    col5, col6 = st.columns(2)
+    for col, kind, label in ((col5, "nrb_annexes", "NRB Annexes (JSON)"), (col6, "movement", "Movement Analysis (JSON)")):
+        pth = result.report_paths.get(kind)
+        if pth and os.path.exists(pth):
+            with open(pth, "rb") as f:
+                col.download_button(label, f, os.path.basename(pth), mime="application/json")
     # Preview HTML inline
     hp = result.report_paths.get("html")
     if hp and os.path.exists(hp):
